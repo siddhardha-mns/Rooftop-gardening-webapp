@@ -1,6 +1,5 @@
 # 🌿 Rooftop Gardening Assistant
 
-![Rooftop Gardening](https://sl.bing.net/df80MIH7xYq)
 
 ## Overview
 
