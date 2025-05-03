@@ -1,8 +1,6 @@
 # 🌿 Rooftop Gardening Assistant
 
-
 ## Overview
-
 A comprehensive Streamlit web application designed to assist urban dwellers in creating and maintaining rooftop gardens. This application combines educational resources, community features, and AI-powered assistance to make rooftop gardening accessible to everyone.
 
 ## 🌱 Features
@@ -36,7 +34,6 @@ A comprehensive Streamlit web application designed to assist urban dwellers in c
 - Timestamped discussions
 
 ## 📋 Prerequisites
-
 - Python 3.7+
 - An API key for Google's Generative AI (Gemini)
 
@@ -59,12 +56,24 @@ source venv/bin/activate
 
 3. Install required dependencies:
 ```bash
-pip install streamlit google-generativeai pydub SpeechRecognition
+pip install -r requirements.txt
 ```
 
-4. Update the API key:
-   - Open the file in your code editor
-   - Replace `"YOUR_API_KEY_HERE"` with your actual Gemini API key
+4. Set up your API key securely using one of these methods:
+
+### Option A: Using Environment Variables (Recommended for local development)
+Create a `.env` file in the project root directory:
+```
+GEMINI_API_KEY=your_api_key_here
+```
+
+### Option B: Using Streamlit Secrets (Recommended for deployment)
+Create a `.streamlit/secrets.toml` file:
+```toml
+GEMINI_API_KEY = "your_api_key_here"
+```
+
+**Note:** Never commit your `.env` file or `.streamlit/secrets.toml` to version control!
 
 ## 💻 Usage
 
@@ -102,6 +111,42 @@ Extend the `valid_users` list in the `login` function to add more authorized use
 ### Adjusting Reminder Times
 Modify the duration values in the `calculate_progress` function calls to change how often reminders appear.
 
+## 🚀 Deployment
+
+### Deploying to Streamlit Cloud
+
+1. Push your code to GitHub (without API keys or sensitive information)
+2. Connect your repository to [Streamlit Cloud](https://streamlit.io/cloud)
+3. Add your API key in the Streamlit Cloud dashboard:
+   - Go to your app's settings
+   - Navigate to "Secrets" section
+   - Add your API key using this format:
+     ```toml
+     GEMINI_API_KEY = "your_actual_api_key_here"
+     ```
+4. Deploy your application
+
+### Environment Variables
+The application is configured to load the API key from:
+1. Environment variables (local development)
+2. Streamlit secrets (cloud deployment)
+3. User input (fallback for development only)
+
+## 🔧 Troubleshooting
+
+### API Key Issues
+- Ensure your API key is correctly set in environment variables or Streamlit secrets
+- Check that you've spelled the variable name correctly as `GEMINI_API_KEY`
+- Verify that your API key is valid and has access to the Gemini 1.5 Flash model
+
+### Audio Processing Problems
+- Make sure you have the required dependencies for audio processing
+- On some systems, additional system libraries may be needed for SpeechRecognition
+
+### Deployment Issues
+- Check the Streamlit Cloud logs for specific error messages
+- Verify that all dependencies are correctly listed in `requirements.txt`
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
@@ -122,13 +167,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Google Generative AI](https://ai.google.dev/) for the Gemini model
 - [SpeechRecognition](https://pypi.org/project/SpeechRecognition/) for audio transcription capabilities
 - [Pydub](https://github.com/jiaaro/pydub) for audio processing
+- [python-dotenv](https://pypi.org/project/python-dotenv/) for environment variable management
 
 ## 📞 Contact
 
-MNS SIDDHARDHA- mnssiddhardha@gmail.com
+MNS SIDDHARDHA - mnssiddhardha@gmail.com
 
 Project Link: [https://github.com/siddhardha-mns/Rooftop-gardening-webapp](https://github.com/siddhardha-mns/Rooftop-gardening-webapp)
 
 ---
-
 🌱 Happy Gardening! 🌱
