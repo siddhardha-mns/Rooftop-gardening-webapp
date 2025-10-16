@@ -7,6 +7,8 @@ import speech_recognition as sr
 from pydub import AudioSegment
 import os
 from dotenv import load_dotenv
+import requests
+from streamlit_lottie import st_lottie
 
 # Load environment variables
 load_dotenv()
@@ -14,7 +16,24 @@ load_dotenv()
 # Set page configuration
 st.set_page_config(page_title="RoofTop Gardening", layout="wide")
 
-# Add animations function
+# Load Lottie animations
+def load_lottie_url(url: str):
+    try:
+        r = requests.get(url)
+        if r.status_code != 200:
+            return None
+        return r.json()
+    except:
+        return None
+
+# Lottie animation URLs
+LOTTIE_GARDEN = "https://lottie.host/4c8d8c8e-3a4a-4b8e-9c8e-8a8c8e8c8e8c/8K8c8e8c8e.json"
+LOTTIE_PLANT = "https://assets2.lottiefiles.com/packages/lf20_bqjqthsp.json"
+LOTTIE_WATERING = "https://assets9.lottiefiles.com/packages/lf20_wd1udlcz.json"
+LOTTIE_CHAT = "https://assets4.lottiefiles.com/packages/lf20_ztevr5mt.json"
+LOTTIE_SUCCESS = "https://assets9.lottiefiles.com/packages/lf20_rovf9gzu.json"
+
+# Add animations and dynamic theming
 def add_animations():
     st.markdown(
     """
@@ -27,29 +46,40 @@ def add_animations():
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
     
+    /* Dynamic gradient background with animation */
     body {
-        background-image: linear-gradient(rgba(34,197,94,0.10), rgba(34,197,94,0.10)), url("https://images.unsplash.com/photo-1501004318641-b39e6451bec6?q=80&w=1600&auto=format&fit=crop");
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
+        background: linear-gradient(-45deg, #e8f5e9, #c8e6c9, #a5d6a7, #81c784);
+        background-size: 400% 400%;
+        animation: gradientShift 15s ease infinite;
         overflow-x: hidden;
+    }
+    
+    @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
     }
     
     .stApp {
         padding: 20px;
         border-radius: 10px;
         backdrop-filter: blur(8px);
+        background: rgba(255, 255, 255, 0.1);
     }
     
-    /* Modern card-like sections */
+    /* Modern card-like sections with gradient borders */
     .element-container {
         animation: fadeInUp 0.6s ease-out forwards;
         opacity: 0;
+        position: relative;
     }
     
-    /* Heading Animations */
+    /* Gradient text for headings */
     h1, h2, h3 { 
-        color: #16a34a !important;
+        background: linear-gradient(135deg, #2e7d32 0%, #66bb6a 50%, #1b5e20 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
         animation: popIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
         opacity: 0;
         font-weight: 700 !important;
@@ -78,18 +108,25 @@ def add_animations():
         opacity: 0;
     }
     
-    /* Button hover effects */
+    /* Enhanced button with gradient and glow */
     .stButton>button {
-        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        background: linear-gradient(135deg, #43a047 0%, #66bb6a 50%, #2e7d32 100%);
+        background-size: 200% 200%;
         color: #ffffff;
         border: 0;
         padding: 0.75rem 2rem;
         border-radius: 12px;
         font-weight: 600;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 4px 6px -1px rgba(34, 197, 94, 0.3);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 15px rgba(67, 160, 71, 0.4);
         position: relative;
         overflow: hidden;
+        animation: buttonGlow 3s ease-in-out infinite;
+    }
+    
+    @keyframes buttonGlow {
+        0%, 100% { box-shadow: 0 4px 15px rgba(67, 160, 71, 0.4); }
+        50% { box-shadow: 0 6px 25px rgba(102, 187, 106, 0.6); }
     }
     
     .stButton>button:before {
@@ -104,9 +141,9 @@ def add_animations():
     }
     
     .stButton>button:hover {
-        background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
-        transform: translateY(-2px);
-        box-shadow: 0 10px 20px -5px rgba(34, 197, 94, 0.5);
+        background-position: 100% 0;
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 12px 30px rgba(67, 160, 71, 0.6);
     }
     
     .stButton>button:hover:before {
@@ -114,48 +151,53 @@ def add_animations():
     }
     
     .stButton>button:active {
-        transform: translateY(0);
+        transform: translateY(0) scale(0.98);
     }
     
-    /* Input fields modern styling */
+    /* Input fields with gradient focus */
     .stTextInput>div>div>input,
     .stTextArea>div>div>textarea {
-        border: 2px solid rgba(34, 197, 94, 0.2) !important;
+        border: 2px solid rgba(67, 160, 71, 0.3) !important;
         border-radius: 12px !important;
         padding: 12px !important;
         transition: all 0.3s ease !important;
-        background: rgba(255, 255, 255, 0.9) !important;
+        background: rgba(255, 255, 255, 0.95) !important;
     }
     
     .stTextInput>div>div>input:focus,
     .stTextArea>div>div>textarea:focus {
-        border-color: #22c55e !important;
-        box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1) !important;
+        border: 2px solid transparent !important;
+        background: linear-gradient(white, white) padding-box,
+                    linear-gradient(135deg, #43a047, #66bb6a) border-box !important;
+        box-shadow: 0 0 0 3px rgba(67, 160, 71, 0.1) !important;
         transform: scale(1.01);
     }
     
-    /* Sidebar modern styling */
+    /* Sidebar with gradient background */
     section[data-testid="stSidebar"] {
-        background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(240,253,244,0.95) 100%);
+        background: linear-gradient(180deg, rgba(232, 245, 233, 0.95) 0%, rgba(200, 230, 201, 0.95) 100%);
         backdrop-filter: blur(10px);
-        border-right: 1px solid rgba(34, 197, 94, 0.2);
+        border-right: 2px solid rgba(67, 160, 71, 0.2);
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
     }
     
     section[data-testid="stSidebar"] .stRadio > label {
         font-weight: 600;
-        color: #16a34a;
+        background: linear-gradient(135deg, #2e7d32, #66bb6a);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
     
-    /* Links */
+    /* Enhanced links with underline animation */
     a { 
-        color: #16a34a !important;
+        color: #43a047 !important;
         text-decoration: none;
         position: relative;
         transition: color 0.3s ease;
     }
     
     a:hover {
-        color: #15803d !important;
+        color: #2e7d32 !important;
     }
     
     a:after {
@@ -165,7 +207,7 @@ def add_animations():
         height: 2px;
         bottom: -2px;
         left: 0;
-        background-color: #16a34a;
+        background: linear-gradient(90deg, #43a047, #66bb6a);
         transition: width 0.3s ease;
     }
     
@@ -173,7 +215,60 @@ def add_animations():
         width: 100%;
     }
     
-    /* Falling Leaves Container */
+    /* Animated floating particles */
+    .particles-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        pointer-events: none;
+        z-index: 0;
+        overflow: hidden;
+    }
+    
+    .particle {
+        position: absolute;
+        background: radial-gradient(circle, rgba(67, 160, 71, 0.3), transparent);
+        border-radius: 50%;
+        animation: float linear infinite;
+    }
+    
+    .particle:nth-child(1) {
+        width: 80px; height: 80px;
+        left: 10%; top: 20%;
+        animation-duration: 20s;
+        animation-delay: 0s;
+    }
+    
+    .particle:nth-child(2) {
+        width: 60px; height: 60px;
+        left: 70%; top: 30%;
+        animation-duration: 25s;
+        animation-delay: 5s;
+    }
+    
+    .particle:nth-child(3) {
+        width: 100px; height: 100px;
+        left: 40%; top: 60%;
+        animation-duration: 30s;
+        animation-delay: 10s;
+    }
+    
+    .particle:nth-child(4) {
+        width: 70px; height: 70px;
+        left: 80%; top: 70%;
+        animation-duration: 22s;
+        animation-delay: 3s;
+    }
+    
+    @keyframes float {
+        0% { transform: translateY(0) rotate(0deg); opacity: 0.3; }
+        50% { transform: translateY(-100px) rotate(180deg); opacity: 0.6; }
+        100% { transform: translateY(0) rotate(360deg); opacity: 0.3; }
+    }
+    
+    /* Falling Leaves with gradient colors */
     .leaves-container {
         position: fixed;
         top: 0;
@@ -185,207 +280,148 @@ def add_animations():
         overflow: hidden;
     }
     
-    /* Individual Leaf Styling */
     .leaf {
         position: absolute;
         top: -50px;
         font-size: 24px;
         opacity: 0.7;
         animation: fall linear infinite;
-        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        filter: drop-shadow(0 2px 4px rgba(46, 125, 50, 0.3));
     }
     
-    /* Different leaf animations for variety */
-    .leaf:nth-child(1) {
-        left: 10%;
-        animation-duration: 12s;
-        animation-delay: 0s;
-        font-size: 28px;
-    }
+    .leaf:nth-child(1) { left: 10%; animation-duration: 12s; animation-delay: 0s; font-size: 28px; }
+    .leaf:nth-child(2) { left: 25%; animation-duration: 15s; animation-delay: 2s; font-size: 22px; }
+    .leaf:nth-child(3) { left: 40%; animation-duration: 18s; animation-delay: 4s; font-size: 26px; }
+    .leaf:nth-child(4) { left: 55%; animation-duration: 14s; animation-delay: 1s; font-size: 24px; }
+    .leaf:nth-child(5) { left: 70%; animation-duration: 16s; animation-delay: 3s; font-size: 20px; }
+    .leaf:nth-child(6) { left: 85%; animation-duration: 13s; animation-delay: 5s; font-size: 25px; }
+    .leaf:nth-child(7) { left: 15%; animation-duration: 17s; animation-delay: 6s; font-size: 23px; }
+    .leaf:nth-child(8) { left: 60%; animation-duration: 19s; animation-delay: 7s; font-size: 21px; }
     
-    .leaf:nth-child(2) {
-        left: 25%;
-        animation-duration: 15s;
-        animation-delay: 2s;
-        font-size: 22px;
-    }
-    
-    .leaf:nth-child(3) {
-        left: 40%;
-        animation-duration: 18s;
-        animation-delay: 4s;
-        font-size: 26px;
-    }
-    
-    .leaf:nth-child(4) {
-        left: 55%;
-        animation-duration: 14s;
-        animation-delay: 1s;
-        font-size: 24px;
-    }
-    
-    .leaf:nth-child(5) {
-        left: 70%;
-        animation-duration: 16s;
-        animation-delay: 3s;
-        font-size: 20px;
-    }
-    
-    .leaf:nth-child(6) {
-        left: 85%;
-        animation-duration: 13s;
-        animation-delay: 5s;
-        font-size: 25px;
-    }
-    
-    .leaf:nth-child(7) {
-        left: 15%;
-        animation-duration: 17s;
-        animation-delay: 6s;
-        font-size: 23px;
-    }
-    
-    .leaf:nth-child(8) {
-        left: 60%;
-        animation-duration: 19s;
-        animation-delay: 7s;
-        font-size: 21px;
-    }
-    
-    /* Keyframe Animations */
     @keyframes fall {
-        0% {
-            top: -50px;
-            transform: translateX(0) rotate(0deg);
-            opacity: 0.7;
-        }
-        25% {
-            transform: translateX(20px) rotate(90deg);
-            opacity: 0.8;
-        }
-        50% {
-            transform: translateX(-20px) rotate(180deg);
-            opacity: 0.6;
-        }
-        75% {
-            transform: translateX(15px) rotate(270deg);
-            opacity: 0.7;
-        }
-        100% {
-            top: 110vh;
-            transform: translateX(-10px) rotate(360deg);
-            opacity: 0.3;
-        }
+        0% { top: -50px; transform: translateX(0) rotate(0deg); opacity: 0.7; }
+        25% { transform: translateX(20px) rotate(90deg); opacity: 0.8; }
+        50% { transform: translateX(-20px) rotate(180deg); opacity: 0.6; }
+        75% { transform: translateX(15px) rotate(270deg); opacity: 0.7; }
+        100% { top: 110vh; transform: translateX(-10px) rotate(360deg); opacity: 0.3; }
     }
     
     @keyframes popIn {
-        0% {
-            opacity: 0;
-            transform: scale(0.8) translateY(20px);
-        }
-        50% {
-            transform: scale(1.05) translateY(-5px);
-        }
-        100% {
-            opacity: 1;
-            transform: scale(1) translateY(0);
-        }
+        0% { opacity: 0; transform: scale(0.8) translateY(20px); }
+        50% { transform: scale(1.05) translateY(-5px); }
+        100% { opacity: 1; transform: scale(1) translateY(0); }
     }
     
     @keyframes fadeInUp {
-        0% {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        100% {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        0% { opacity: 0; transform: translateY(30px); }
+        100% { opacity: 1; transform: translateY(0); }
     }
     
-    /* Card-like containers */
+    /* Card-like containers with gradient border */
     .stContainer {
-        background: rgba(255, 255, 255, 0.9);
+        background: rgba(255, 255, 255, 0.95);
         border-radius: 16px;
         padding: 1.5rem;
         margin: 1rem 0;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         transition: all 0.3s ease;
+        border: 2px solid transparent;
+        background-clip: padding-box;
     }
     
     .stContainer:hover {
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 10px 25px -3px rgba(67, 160, 71, 0.3);
         transform: translateY(-2px);
+        border-color: rgba(67, 160, 71, 0.3);
     }
     
-    /* Expander modern styling */
+    /* Expander with gradient */
     .streamlit-expanderHeader {
-        background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(22, 163, 74, 0.1) 100%);
+        background: linear-gradient(135deg, rgba(67, 160, 71, 0.1) 0%, rgba(102, 187, 106, 0.1) 100%);
         border-radius: 12px;
-        border: 2px solid rgba(34, 197, 94, 0.2);
+        border: 2px solid rgba(67, 160, 71, 0.2);
         font-weight: 600;
         transition: all 0.3s ease;
     }
     
     .streamlit-expanderHeader:hover {
-        background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(22, 163, 74, 0.2) 100%);
-        border-color: #22c55e;
+        background: linear-gradient(135deg, rgba(67, 160, 71, 0.2) 0%, rgba(102, 187, 106, 0.2) 100%);
+        border-color: #43a047;
+        box-shadow: 0 4px 12px rgba(67, 160, 71, 0.2);
     }
     
-    /* Info, Success, Warning boxes */
-    .stInfo, .stSuccess, .stWarning, .stError {
+    /* Info boxes with gradient backgrounds */
+    .stInfo {
+        background: linear-gradient(135deg, rgba(33, 150, 243, 0.1), rgba(30, 136, 229, 0.1));
+        border-left: 4px solid #2196F3;
         border-radius: 12px;
         padding: 1rem 1.5rem;
-        border-left: 4px solid;
     }
     
-    /* Smooth page transitions */
+    .stSuccess {
+        background: linear-gradient(135deg, rgba(76, 175, 80, 0.1), rgba(67, 160, 71, 0.1));
+        border-left: 4px solid #4CAF50;
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+    }
+    
+    .stWarning {
+        background: linear-gradient(135deg, rgba(255, 152, 0, 0.1), rgba(251, 140, 0, 0.1));
+        border-left: 4px solid #FF9800;
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+    }
+    
+    .stError {
+        background: linear-gradient(135deg, rgba(244, 67, 54, 0.1), rgba(229, 57, 53, 0.1));
+        border-left: 4px solid #F44336;
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+    }
+    
+    /* Progress bar with gradient */
+    .stProgress > div > div > div {
+        background: linear-gradient(90deg, #43a047 0%, #66bb6a 50%, #81c784 100%);
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(67, 160, 71, 0.3);
+    }
+    
+    /* Form styling with gradient */
+    .stForm {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(232, 245, 233, 0.95));
+        padding: 2rem;
+        border-radius: 16px;
+        box-shadow: 0 8px 16px -4px rgba(67, 160, 71, 0.2);
+        border: 2px solid rgba(67, 160, 71, 0.1);
+    }
+    
+    /* Page transition animation */
     .main .block-container {
         animation: pageLoad 0.5s ease-out;
     }
     
     @keyframes pageLoad {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    /* Form styling */
-    .stForm {
-        background: rgba(255, 255, 255, 0.95);
-        padding: 2rem;
-        border-radius: 16px;
-        box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.1);
-    }
-    
-    /* Progress bar styling */
-    .stProgress > div > div > div {
-        background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%);
-        border-radius: 10px;
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
     }
     
     /* Mobile responsiveness */
     @media (max-width: 768px) {
-        h1 {
-            font-size: 1.8rem !important;
-        }
-        
-        h2 {
-            font-size: 1.5rem !important;
-        }
-        
-        .leaf {
-            font-size: 18px;
-        }
+        h1 { font-size: 1.8rem !important; }
+        h2 { font-size: 1.5rem !important; }
+        .leaf { font-size: 18px; }
+        .particle { width: 50px !important; height: 50px !important; }
     }
     </style>
     
-    <!-- Falling Leaves HTML -->
+    <!-- Falling Leaves and Particles HTML -->
+    <div class="particles-container">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+    
     <div class="leaves-container">
         <div class="leaf">🍃</div>
         <div class="leaf">🍂</div>
@@ -396,16 +432,6 @@ def add_animations():
         <div class="leaf">🌿</div>
         <div class="leaf">🍂</div>
     </div>
-    
-    <script>
-    // Add staggered animation delays to elements
-    document.addEventListener('DOMContentLoaded', function() {
-        const elements = document.querySelectorAll('.element-container');
-        elements.forEach((el, index) => {
-            el.style.animationDelay = (index * 0.1) + 's';
-        });
-    });
-    </script>
     """,
     unsafe_allow_html=True
     )
@@ -465,43 +491,51 @@ def is_authenticated():
     return st.session_state.supabase_user is not None and st.session_state.supabase_session is not None
 
 def supabase_login_ui():
-    st.title("🔐 Sign in to RoofTop Gardening")
-    st.caption("Please sign in or create an account to continue.")
-    mode = st.radio("", ["Sign In", "Sign Up"], horizontal=True)
-    email = st.text_input("Email")
-    password = st.text_input("Password", type="password")
-    sb = get_supabase()
-    if not sb:
-        st.error("Supabase is not configured. Set SUPABASE_URL and SUPABASE_ANON_KEY in .env or secrets.")
-        return
-    col_a, col_b = st.columns([1,1])
-    with col_a:
-        if st.button(mode):
-            if not email or not password:
-                st.warning("Enter email and password.")
-                return
-            try:
-                if mode == "Sign In":
-                    res = sb.auth.sign_in_with_password({"email": email, "password": password})
-                else:
-                    res = sb.auth.sign_up({"email": email, "password": password})
-                user = getattr(res, "user", None) or getattr(res, "session", {}).get("user")
-                session = getattr(res, "session", None)
-                if not session:
-                    st.info("Check your email to confirm your account, then sign in.")
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        lottie_plant = load_lottie_url(LOTTIE_PLANT)
+        if lottie_plant:
+            st_lottie(lottie_plant, height=200, key="login_plant")
+        
+        st.title("🔐 Sign in to RoofTop Gardening")
+        st.caption("Please sign in or create an account to continue.")
+        
+        mode = st.radio("", ["Sign In", "Sign Up"], horizontal=True)
+        email = st.text_input("Email")
+        password = st.text_input("Password", type="password")
+        sb = get_supabase()
+        if not sb:
+            st.error("Supabase is not configured. Set SUPABASE_URL and SUPABASE_ANON_KEY in .env or secrets.")
+            return
+        
+        col_a, col_b = st.columns([1,1])
+        with col_a:
+            if st.button(mode, use_container_width=True):
+                if not email or not password:
+                    st.warning("Enter email and password.")
                     return
-                st.session_state.supabase_user = user
-                st.session_state.supabase_session = session
-                st.success("Signed in successfully.")
-                st.rerun()
-            except Exception as e:
-                st.error(f"Auth error: {e}")
-    with col_b:
-        if st.button("Forgot password?"):
-            st.info("Password recovery must be handled via Supabase auth flows (magic links).")
+                try:
+                    if mode == "Sign In":
+                        res = sb.auth.sign_in_with_password({"email": email, "password": password})
+                    else:
+                        res = sb.auth.sign_up({"email": email, "password": password})
+                    user = getattr(res, "user", None) or getattr(res, "session", {}).get("user")
+                    session = getattr(res, "session", None)
+                    if not session:
+                        st.info("Check your email to confirm your account, then sign in.")
+                        return
+                    st.session_state.supabase_user = user
+                    st.session_state.supabase_session = session
+                    st.success("Signed in successfully.")
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"Auth error: {e}")
+        with col_b:
+            if st.button("Forgot password?", use_container_width=True):
+                st.info("Password recovery must be handled via Supabase auth flows (magic links).")
 
-    st.divider()
-    st.caption("By continuing, you agree to our Terms and Privacy Policy.")
+        st.divider()
+        st.caption("By continuing, you agree to our Terms and Privacy Policy.")
 
 # Calculate progress for timer reminders
 def calculate_progress(start_time, total_duration):
@@ -554,8 +588,12 @@ def main():
         return
 
     with st.sidebar:
-        st.write(f"Signed in as: {st.session_state.supabase_user.email if st.session_state.supabase_user else 'User'}")
-        if st.button("Log out"):
+        lottie_plant = load_lottie_url(LOTTIE_PLANT)
+        if lottie_plant:
+            st_lottie(lottie_plant, height=150, key="sidebar_plant")
+        
+        st.write(f"🌱 Signed in as: **{st.session_state.supabase_user.email if st.session_state.supabase_user else 'User'}**")
+        if st.button("🚪 Log out", use_container_width=True):
             sb = get_supabase()
             try:
                 if sb:
@@ -586,29 +624,49 @@ def main():
 
 # Home Page Content
 def render_home_page():
-    st.title("🌿 Welcome to Our RoofTop Gardening Web App!")
-    st.markdown("""
-     RoofTop gardening transforms underutilized rooftop spaces into thriving green areas.
-     This web app serves as your **go-to guide** for starting and maintaining a **cost-effective, sustainable** garden right on your terrace.
-     With easy-to-follow tips and expert recommendations, you can enjoy **fresh, organic produce** while contributing to a greener environment.
-     """)
+    col1, col2 = st.columns([2, 1])
+    with col1:
+        st.title("🌿 Welcome to Our RoofTop Gardening Web App!")
+        st.markdown("""
+        RoofTop gardening transforms underutilized rooftop spaces into thriving green areas.
+        This web app serves as your **go-to guide** for starting and maintaining a **cost-effective, sustainable** garden right on your terrace.
+        With easy-to-follow tips and expert recommendations, you can enjoy **fresh, organic produce** while contributing to a greener environment.
+        """)
+    with col2:
+        lottie_garden = load_lottie_url(LOTTIE_PLANT)
+        if lottie_garden:
+            st_lottie(lottie_garden, height=300, key="home_garden")
+    
     st.header("🌱 Why RoofTop Gardening?")
     st.markdown("""
-     - **Utilize Your Space:** Convert rooftops into lush gardens.
-     - **Grow Fresh & Organic:** Enjoy pesticide-free, home-grown produce.
-     - **Cost-Effective Solutions:** Gardening tips that don't break the bank.
-     - **Health & Well-being:** Gardening reduces stress and promotes a healthier lifestyle.
-     - **Eco-Friendly Choice:** Green spaces help lower urban heat and improve air quality.
-     """)
+    - **Utilize Your Space:** Convert rooftops into lush gardens.
+    - **Grow Fresh & Organic:** Enjoy pesticide-free, home-grown produce.
+    - **Cost-Effective Solutions:** Gardening tips that don't break the bank.
+    - **Health & Well-being:** Gardening reduces stress and promotes a healthier lifestyle.
+    - **Eco-Friendly Choice:** Green spaces help lower urban heat and improve air quality.
+    """)
+    
     st.header("🚀 What You'll Find Here")
-    st.markdown("""
-     ✅ **Step-by-step gardening guides** ✅ **Best plants for rooftop gardening** ✅ **DIY solutions for low-cost gardening** ✅ **Organic farming techniques** ✅ **Community & expert advice** """)
-    st.info("🌍 Start your RoofTop gardening journey today and make a positive impact on your health and the environment!")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.info("✅ **Step-by-step gardening guides**")
+    with col2:
+        st.info("✅ **Best plants for rooftop gardening**")
+    with col3:
+        st.info("✅ **DIY solutions for low-cost gardening**")
+    
+    st.success("🌍 Start your RoofTop gardening journey today and make a positive impact on your health and the environment!")
 
 # Chatbot Page Content
 def render_chatbot_page():
-    st.title("🤖 Gardening Assistant Chatbot")
-    st.markdown("Ask anything about **RoofTop gardening** and get instant responses powered by **Gemini Flash 2 AI**!")
+    col1, col2 = st.columns([2, 1])
+    with col1:
+        st.title("🤖 Gardening Assistant Chatbot")
+        st.markdown("Ask anything about **RoofTop gardening** and get instant responses powered by **Gemini Flash 2 AI**!")
+    with col2:
+        lottie_chat = load_lottie_url(LOTTIE_CHAT)
+        if lottie_chat:
+            st_lottie(lottie_chat, height=200, key="chatbot_anim")
     
     try:
         model = setup_gemini()
@@ -640,6 +698,11 @@ def render_chatbot_page():
                             response = model.generate_content(user_input)
                             st.subheader("🤖 AI Response:")
                             st.markdown(f"**{response.text}**")
+                            
+                            # Show success animation
+                            lottie_success = load_lottie_url(LOTTIE_SUCCESS)
+                            if lottie_success:
+                                st_lottie(lottie_success, height=100, key="success_anim")
                         except Exception as e:
                             st.error(f"⚠️ Error: Could not process your request. {e}")
                 else:
@@ -653,6 +716,13 @@ def render_chatbot_page():
 def render_prompts_page():
     st.title("📝 RoofTop Gardening Prompts")
     st.markdown("Explore a comprehensive list of prompts to guide your rooftop gardening journey.")
+    
+    # Add Lottie animation at the top
+    lottie_watering = load_lottie_url(LOTTIE_WATERING)
+    if lottie_watering:
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st_lottie(lottie_watering, height=200, key="prompts_watering")
     
     categories = {
         "🌿 How to Design Rooftop Gardening": [
@@ -786,12 +856,20 @@ def render_forum_page():
 
 # Contact Page Content
 def render_contact_page():
-    st.title("📬 Contact Us")
-    st.markdown("We'd love to hear from you. Send us your questions or feedback.")
+    col1, col2 = st.columns([2, 1])
+    with col1:
+        st.title("📬 Contact Us")
+        st.markdown("We'd love to hear from you. Send us your questions or feedback.")
+    with col2:
+        lottie_plant = load_lottie_url(LOTTIE_PLANT)
+        if lottie_plant:
+            st_lottie(lottie_plant, height=200, key="contact_plant")
+    
     name = st.text_input("Your Name")
     email = st.text_input("Email")
     message = st.text_area("Message", height=150)
     submitted = st.button("Send Message")
+    
     if submitted:
         if not name or not email or not message:
             st.warning("Please fill in all fields.")
@@ -805,6 +883,10 @@ def render_contact_page():
             res = sb.table("contacts").insert(payload).execute()
             if getattr(res, "data", None) is not None:
                 st.success("Thanks! Your message has been sent.")
+                # Show success animation
+                lottie_success = load_lottie_url(LOTTIE_SUCCESS)
+                if lottie_success:
+                    st_lottie(lottie_success, height=150, key="contact_success")
             else:
                 st.info("Submitted, but no data returned. Check your Supabase table.")
         except Exception as e:
@@ -922,6 +1004,12 @@ def render_checkout_page():
             ]
             sb.table("order_items").insert(items_payload).execute()
             st.success(f"Order placed successfully! Order ID: {order_id}")
+            
+            # Show success animation
+            lottie_success = load_lottie_url(LOTTIE_SUCCESS)
+            if lottie_success:
+                st_lottie(lottie_success, height=200, key="checkout_success")
+            
             st.session_state.cart = []
         except Exception as e:
             st.error(f"Could not place order: {e}")
