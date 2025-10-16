@@ -195,26 +195,6 @@ def main():
             st.session_state.supabase_session = None
             st.rerun()
 
-    # Layout for Reminders and Login Form
-    col1, col2 = st.columns([3, 1])
-    
-    # Reminders in the Left Column
-    with col1:
-        st.write("🌿 Reminders")
-        water_progress, water_message = calculate_progress(st.session_state.water_start_time, 24 * 3600)
-        fertilizer_progress, fertilizer_message = calculate_progress(st.session_state.fertilizer_start_time, 48 * 3600)
-        water_placeholder = st.empty()
-        fertilizer_placeholder = st.empty()
-        water_placeholder.progress(water_progress / 100)
-        water_placeholder.write(f"💧 Water Reminder: {water_message}")
-        fertilizer_placeholder.progress(fertilizer_progress / 100)
-        fertilizer_placeholder.write(f"🌱 Fertilizer Reminder: {fertilizer_message}")
-    
-    # Right Column now shows helpful tips instead of login
-    with col2:
-        st.success("You are logged in.")
-        st.info("Use the sidebar to navigate pages.")
-    
     # Sidebar Navigation
     st.sidebar.title("🌿 Navigation")
     page = st.sidebar.radio("Go to", ["Home", "Chatbot", "Prompts", "Forum", "Contact", "Order", "Checkout"])
@@ -264,6 +244,7 @@ def render_chatbot_page():
     try:
         model = setup_gemini()
         if model:
+            # Chat input options - text or audio
             input_method = st.radio("Choose input method:", ["Text", "Audio"])
             user_input = ""
             
@@ -284,6 +265,7 @@ def render_chatbot_page():
                             else:
                                 st.error("Could not transcribe audio. Please try again.")
             
+            # Generate response
             if st.button("Generate Response 🌿"):
                 if user_input:
                     with st.spinner("Thinking... 💡"):
@@ -305,6 +287,7 @@ def render_prompts_page():
     st.title("📝 RoofTop Gardening Prompts")
     st.markdown("Explore a comprehensive list of prompts to guide your rooftop gardening journey.")
     
+    # Prompts categories and expandable sections
     categories = {
         "🌿 How to Design Rooftop Gardening": [
             "How to Design Rooftop Gardening",
@@ -368,10 +351,14 @@ def render_prompts_page():
             "How can I use traps to control pests in my rooftop garden?"
          ]
      }
+    
+    # Display prompts in expandable sections
     for category, prompts in categories.items():
         with st.expander(category):
             for i, prompt in enumerate(prompts, 1):
                 st.markdown(f"{i}. {prompt}")
+    
+    # Additional categories (collapsed by default)
     with st.expander("View More Categories"):
         st.header("🌱 Soil Preparation and Maintenance")
         st.header("🌍 Sustainable Practices in Rooftop Gardening")
@@ -384,16 +371,20 @@ def render_prompts_page():
 def render_forum_page():
     st.title("💬 Community Forum")
     st.markdown("Engage with fellow gardening enthusiasts, ask questions, and share experiences.")
+    
+    # Form to submit a new discussion
     with st.form(key="forum_form"):
         user_name = st.text_input("Your Name", placeholder="Enter your name")
         post_content = st.text_area("Share your thoughts or ask a question...", height=100)
         submit_button = st.form_submit_button("Post")
+        
         if submit_button and user_name and post_content:
             timestamp = datetime.now()
             new_post = {"user": user_name, "content": post_content, "replies": [], "timestamp": timestamp}
             st.session_state.forum_data.append(new_post)
             st.success("✅ Your post has been added!")
             st.rerun()
+    
     st.write("### 🌿 Community Discussions")
     if st.session_state.forum_data:
         for idx, post in enumerate(st.session_state.forum_data):
@@ -401,15 +392,20 @@ def render_forum_page():
                 st.markdown(f"**📝 {post['user']} says:**")
                 st.info(post["content"])
                 st.caption(f"Posted on: {format_datetime(post['timestamp'])}")
+                
+                # Reply button to toggle reply form
                 reply_key = f"reply_button_{idx}"
                 if st.button("Reply", key=reply_key):
                     st.session_state.replying[idx] = not st.session_state.replying.get(idx, False)
                     st.rerun()
+                
+                # Display reply form if the reply button is clicked
                 if st.session_state.replying.get(idx, False):
                     with st.form(key=f"reply_form_{idx}"):
                         reply_name = st.text_input("Your Name", placeholder="Enter your name", key=f"reply_name_{idx}")
                         reply_content = st.text_area("Your Reply...", height=50, key=f"reply_content_{idx}")
                         reply_submit_button = st.form_submit_button("Submit Reply")
+                        
                         if reply_submit_button and reply_name and reply_content:
                             reply_timestamp = datetime.now()
                             new_reply = {"user": reply_name, "content": reply_content, "timestamp": reply_timestamp}
@@ -417,6 +413,8 @@ def render_forum_page():
                             st.session_state.replying[idx] = False
                             st.success("✅ Your reply has been added!")
                             st.rerun()
+                
+                # Display replies
                 if post["replies"]:
                     st.write("**Replies:**")
                     for reply in post["replies"]:
@@ -464,6 +462,7 @@ def get_catalog():
 
 def add_to_cart(item, quantity):
     qty = max(1, int(quantity))
+    # merge if same item exists
     for cart_item in st.session_state.cart:
         if cart_item["id"] == item["id"]:
             cart_item["quantity"] += qty
@@ -480,6 +479,7 @@ def cart_total():
 def render_order_page():
     st.title("🛒 Order Supplies")
     st.markdown("Select items for your rooftop garden and add them to your cart.")
+
     catalog = get_catalog()
     for product in catalog:
         cols = st.columns([5, 2, 2])
@@ -492,6 +492,7 @@ def render_order_page():
                 add_to_cart(product, qty)
                 st.success(f"Added {qty} × {product['name']} to cart")
                 st.rerun()
+
     st.subheader("Your Cart")
     if st.session_state.cart:
         for ci in st.session_state.cart:
@@ -518,16 +519,19 @@ def render_checkout_page():
     if not st.session_state.cart:
         st.info("Your cart is empty. Add items from the Order page.")
         return
+
     st.subheader("Order Summary")
     for ci in st.session_state.cart:
         st.write(f"- {ci['name']} × {ci['quantity']} — ${ci['price']*ci['quantity']:.2f}")
     total = cart_total()
     st.write(f"**Total: ${total:.2f}**")
+
     st.subheader("Shipping Details")
     customer_name = st.text_input("Full Name")
     email = st.text_input("Email")
     address = st.text_area("Address", height=100)
     place_order = st.button("Place Order")
+
     if place_order:
         if not customer_name or not email or not address:
             st.warning("Please fill in all details.")
@@ -537,7 +541,13 @@ def render_checkout_page():
             st.error("Supabase is not configured. Set SUPABASE_URL and SUPABASE_ANON_KEY.")
             return
         try:
-            order_payload = {"customer_name": customer_name, "email": email, "address": address, "total": float(f"{total:.2f}"), "created_at": datetime.utcnow().isoformat()}
+            order_payload = {
+                "customer_name": customer_name,
+                "email": email,
+                "address": address,
+                "total": float(f"{total:.2f}"),
+                "created_at": datetime.utcnow().isoformat()
+            }
             order_res = sb.table("orders").insert(order_payload).execute()
             data = getattr(order_res, "data", None)
             if not data:
@@ -547,7 +557,10 @@ def render_checkout_page():
             if not order_id:
                 st.error("Could not determine order ID from response.")
                 return
-            items_payload = [{"order_id": order_id, "product_id": ci["id"], "product_name": ci["name"], "unit_price": ci["price"], "quantity": ci["quantity"]} for ci in st.session_state.cart]
+            items_payload = [
+                {"order_id": order_id, "product_id": ci["id"], "product_name": ci["name"], "unit_price": ci["price"], "quantity": ci["quantity"]}
+                for ci in st.session_state.cart
+            ]
             sb.table("order_items").insert(items_payload).execute()
             st.success(f"Order placed successfully! Order ID: {order_id}")
             st.session_state.cart = []
