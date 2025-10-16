@@ -1,4 +1,3 @@
-
 import streamlit as st
 import time
 import google.generativeai as genai
@@ -15,28 +14,404 @@ load_dotenv()
 # Set page configuration
 st.set_page_config(page_title="RoofTop Gardening", layout="wide")
 
-# Apply custom CSS for beautiful plants background and green accents
-st.markdown(
-"""
- <style>
- body {
- background-image: linear-gradient(rgba(34,197,94,0.10), rgba(34,197,94,0.10)), url("https://images.unsplash.com/photo-1501004318641-b39e6451bec6?q=80&w=1600&auto=format&fit=crop");
- background-size: cover;
- background-repeat: no-repeat;
- background-attachment: fixed;
- }
- .stApp {
- padding: 20px;
- border-radius: 10px;
- }
- h1, h2, h3 { color: #16a34a; }
- a { color: #16a34a; }
- .stButton>button { background-color: #22c55e; color: #ffffff; border: 0; }
- .stButton>button:hover { background-color: #16a34a; }
- </style>
- """,
-unsafe_allow_html=True
-)
+# Add animations function
+def add_animations():
+    st.markdown(
+    """
+    <style>
+    /* Import Google Fonts for modern look */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    /* Global Styles */
+    * {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    
+    body {
+        background-image: linear-gradient(rgba(34,197,94,0.10), rgba(34,197,94,0.10)), url("https://images.unsplash.com/photo-1501004318641-b39e6451bec6?q=80&w=1600&auto=format&fit=crop");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        overflow-x: hidden;
+    }
+    
+    .stApp {
+        padding: 20px;
+        border-radius: 10px;
+        backdrop-filter: blur(8px);
+    }
+    
+    /* Modern card-like sections */
+    .element-container {
+        animation: fadeInUp 0.6s ease-out forwards;
+        opacity: 0;
+    }
+    
+    /* Heading Animations */
+    h1, h2, h3 { 
+        color: #16a34a !important;
+        animation: popIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+        opacity: 0;
+        font-weight: 700 !important;
+        letter-spacing: -0.02em;
+    }
+    
+    h1 {
+        animation-delay: 0.2s;
+        font-size: 2.5rem !important;
+    }
+    
+    h2 {
+        animation-delay: 0.4s;
+        font-size: 2rem !important;
+    }
+    
+    h3 {
+        animation-delay: 0.6s;
+        font-size: 1.5rem !important;
+    }
+    
+    /* Paragraph text animations */
+    p, .stMarkdown, .stInfo, .stSuccess, .stWarning {
+        animation: fadeInUp 0.8s ease-out forwards;
+        animation-delay: 0.8s;
+        opacity: 0;
+    }
+    
+    /* Button hover effects */
+    .stButton>button {
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        color: #ffffff;
+        border: 0;
+        padding: 0.75rem 2rem;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 6px -1px rgba(34, 197, 94, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stButton>button:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        transition: left 0.5s;
+    }
+    
+    .stButton>button:hover {
+        background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px -5px rgba(34, 197, 94, 0.5);
+    }
+    
+    .stButton>button:hover:before {
+        left: 100%;
+    }
+    
+    .stButton>button:active {
+        transform: translateY(0);
+    }
+    
+    /* Input fields modern styling */
+    .stTextInput>div>div>input,
+    .stTextArea>div>div>textarea {
+        border: 2px solid rgba(34, 197, 94, 0.2) !important;
+        border-radius: 12px !important;
+        padding: 12px !important;
+        transition: all 0.3s ease !important;
+        background: rgba(255, 255, 255, 0.9) !important;
+    }
+    
+    .stTextInput>div>div>input:focus,
+    .stTextArea>div>div>textarea:focus {
+        border-color: #22c55e !important;
+        box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1) !important;
+        transform: scale(1.01);
+    }
+    
+    /* Sidebar modern styling */
+    section[data-testid="stSidebar"] {
+        background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(240,253,244,0.95) 100%);
+        backdrop-filter: blur(10px);
+        border-right: 1px solid rgba(34, 197, 94, 0.2);
+    }
+    
+    section[data-testid="stSidebar"] .stRadio > label {
+        font-weight: 600;
+        color: #16a34a;
+    }
+    
+    /* Links */
+    a { 
+        color: #16a34a !important;
+        text-decoration: none;
+        position: relative;
+        transition: color 0.3s ease;
+    }
+    
+    a:hover {
+        color: #15803d !important;
+    }
+    
+    a:after {
+        content: '';
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: -2px;
+        left: 0;
+        background-color: #16a34a;
+        transition: width 0.3s ease;
+    }
+    
+    a:hover:after {
+        width: 100%;
+    }
+    
+    /* Falling Leaves Container */
+    .leaves-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        pointer-events: none;
+        z-index: 1;
+        overflow: hidden;
+    }
+    
+    /* Individual Leaf Styling */
+    .leaf {
+        position: absolute;
+        top: -50px;
+        font-size: 24px;
+        opacity: 0.7;
+        animation: fall linear infinite;
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+    }
+    
+    /* Different leaf animations for variety */
+    .leaf:nth-child(1) {
+        left: 10%;
+        animation-duration: 12s;
+        animation-delay: 0s;
+        font-size: 28px;
+    }
+    
+    .leaf:nth-child(2) {
+        left: 25%;
+        animation-duration: 15s;
+        animation-delay: 2s;
+        font-size: 22px;
+    }
+    
+    .leaf:nth-child(3) {
+        left: 40%;
+        animation-duration: 18s;
+        animation-delay: 4s;
+        font-size: 26px;
+    }
+    
+    .leaf:nth-child(4) {
+        left: 55%;
+        animation-duration: 14s;
+        animation-delay: 1s;
+        font-size: 24px;
+    }
+    
+    .leaf:nth-child(5) {
+        left: 70%;
+        animation-duration: 16s;
+        animation-delay: 3s;
+        font-size: 20px;
+    }
+    
+    .leaf:nth-child(6) {
+        left: 85%;
+        animation-duration: 13s;
+        animation-delay: 5s;
+        font-size: 25px;
+    }
+    
+    .leaf:nth-child(7) {
+        left: 15%;
+        animation-duration: 17s;
+        animation-delay: 6s;
+        font-size: 23px;
+    }
+    
+    .leaf:nth-child(8) {
+        left: 60%;
+        animation-duration: 19s;
+        animation-delay: 7s;
+        font-size: 21px;
+    }
+    
+    /* Keyframe Animations */
+    @keyframes fall {
+        0% {
+            top: -50px;
+            transform: translateX(0) rotate(0deg);
+            opacity: 0.7;
+        }
+        25% {
+            transform: translateX(20px) rotate(90deg);
+            opacity: 0.8;
+        }
+        50% {
+            transform: translateX(-20px) rotate(180deg);
+            opacity: 0.6;
+        }
+        75% {
+            transform: translateX(15px) rotate(270deg);
+            opacity: 0.7;
+        }
+        100% {
+            top: 110vh;
+            transform: translateX(-10px) rotate(360deg);
+            opacity: 0.3;
+        }
+    }
+    
+    @keyframes popIn {
+        0% {
+            opacity: 0;
+            transform: scale(0.8) translateY(20px);
+        }
+        50% {
+            transform: scale(1.05) translateY(-5px);
+        }
+        100% {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+    
+    @keyframes fadeInUp {
+        0% {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Card-like containers */
+    .stContainer {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin: 1rem 0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .stContainer:hover {
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+    }
+    
+    /* Expander modern styling */
+    .streamlit-expanderHeader {
+        background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(22, 163, 74, 0.1) 100%);
+        border-radius: 12px;
+        border: 2px solid rgba(34, 197, 94, 0.2);
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .streamlit-expanderHeader:hover {
+        background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(22, 163, 74, 0.2) 100%);
+        border-color: #22c55e;
+    }
+    
+    /* Info, Success, Warning boxes */
+    .stInfo, .stSuccess, .stWarning, .stError {
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        border-left: 4px solid;
+    }
+    
+    /* Smooth page transitions */
+    .main .block-container {
+        animation: pageLoad 0.5s ease-out;
+    }
+    
+    @keyframes pageLoad {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Form styling */
+    .stForm {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 2rem;
+        border-radius: 16px;
+        box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Progress bar styling */
+    .stProgress > div > div > div {
+        background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%);
+        border-radius: 10px;
+    }
+    
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+        h1 {
+            font-size: 1.8rem !important;
+        }
+        
+        h2 {
+            font-size: 1.5rem !important;
+        }
+        
+        .leaf {
+            font-size: 18px;
+        }
+    }
+    </style>
+    
+    <!-- Falling Leaves HTML -->
+    <div class="leaves-container">
+        <div class="leaf">🍃</div>
+        <div class="leaf">🍂</div>
+        <div class="leaf">🍃</div>
+        <div class="leaf">🌿</div>
+        <div class="leaf">🍂</div>
+        <div class="leaf">🍃</div>
+        <div class="leaf">🌿</div>
+        <div class="leaf">🍂</div>
+    </div>
+    
+    <script>
+    // Add staggered animation delays to elements
+    document.addEventListener('DOMContentLoaded', function() {
+        const elements = document.querySelectorAll('.element-container');
+        elements.forEach((el, index) => {
+            el.style.animationDelay = (index * 0.1) + 's';
+        });
+    });
+    </script>
+    """,
+    unsafe_allow_html=True
+    )
+
+# Call animations at the start
+add_animations()
 
 # Initialize session state variables
 def init_session_state():
@@ -53,7 +428,7 @@ def init_session_state():
     if "replying" not in st.session_state:
         st.session_state.replying = {}
     if "cart" not in st.session_state:
-        st.session_state.cart = []  # list of {id, name, price, quantity}
+        st.session_state.cart = []
     if "supabase_user" not in st.session_state:
         st.session_state.supabase_user = None
     if "supabase_session" not in st.session_state:
@@ -63,14 +438,13 @@ init_session_state()
 
 # Supabase client setup (cached)
 try:
-    from supabase import create_client, Client  # type: ignore
+    from supabase import create_client, Client
 except Exception:
     create_client = None
     Client = None
 
 def _get_secret(name):
     try:
-        # Accessing st.secrets may throw if file missing; guard with try
         if hasattr(st, "secrets") and name in st.secrets:
             return st.secrets.get(name)
     except Exception:
@@ -175,12 +549,10 @@ def process_audio(audio_file):
 
 # Main application UI
 def main():
-    # Gate entire app behind Supabase auth
     if not is_authenticated():
         supabase_login_ui()
         return
 
-    # Top bar with logout
     with st.sidebar:
         st.write(f"Signed in as: {st.session_state.supabase_user.email if st.session_state.supabase_user else 'User'}")
         if st.button("Log out"):
@@ -194,11 +566,9 @@ def main():
             st.session_state.supabase_session = None
             st.rerun()
 
-    # Sidebar Navigation
     st.sidebar.title("🌿 Navigation")
     page = st.sidebar.radio("Go to", ["Home", "Chatbot", "Prompts", "Forum", "Contact", "Order", "Checkout"])
     
-    # Page content based on selection
     if page == "Home":
         render_home_page()
     elif page == "Chatbot":
@@ -243,7 +613,6 @@ def render_chatbot_page():
     try:
         model = setup_gemini()
         if model:
-            # Chat input options - text or audio
             input_method = st.radio("Choose input method:", ["Text", "Audio"])
             user_input = ""
             
@@ -264,7 +633,6 @@ def render_chatbot_page():
                             else:
                                 st.error("Could not transcribe audio. Please try again.")
             
-            # Generate response
             if st.button("Generate Response 🌿"):
                 if user_input:
                     with st.spinner("Thinking... 💡"):
@@ -286,7 +654,6 @@ def render_prompts_page():
     st.title("📝 RoofTop Gardening Prompts")
     st.markdown("Explore a comprehensive list of prompts to guide your rooftop gardening journey.")
     
-    # Prompts categories and expandable sections
     categories = {
         "🌿 How to Design Rooftop Gardening": [
             "How to Design Rooftop Gardening",
@@ -351,13 +718,11 @@ def render_prompts_page():
          ]
      }
     
-    # Display prompts in expandable sections
     for category, prompts in categories.items():
         with st.expander(category):
             for i, prompt in enumerate(prompts, 1):
                 st.markdown(f"{i}. {prompt}")
     
-    # Additional categories (collapsed by default)
     with st.expander("View More Categories"):
         st.header("🌱 Soil Preparation and Maintenance")
         st.header("🌍 Sustainable Practices in Rooftop Gardening")
@@ -371,7 +736,6 @@ def render_forum_page():
     st.title("💬 Community Forum")
     st.markdown("Engage with fellow gardening enthusiasts, ask questions, and share experiences.")
     
-    # Form to submit a new discussion
     with st.form(key="forum_form"):
         user_name = st.text_input("Your Name", placeholder="Enter your name")
         post_content = st.text_area("Share your thoughts or ask a question...", height=100)
@@ -392,13 +756,11 @@ def render_forum_page():
                 st.info(post["content"])
                 st.caption(f"Posted on: {format_datetime(post['timestamp'])}")
                 
-                # Reply button to toggle reply form
                 reply_key = f"reply_button_{idx}"
                 if st.button("Reply", key=reply_key):
                     st.session_state.replying[idx] = not st.session_state.replying.get(idx, False)
                     st.rerun()
                 
-                # Display reply form if the reply button is clicked
                 if st.session_state.replying.get(idx, False):
                     with st.form(key=f"reply_form_{idx}"):
                         reply_name = st.text_input("Your Name", placeholder="Enter your name", key=f"reply_name_{idx}")
@@ -413,7 +775,6 @@ def render_forum_page():
                             st.success("✅ Your reply has been added!")
                             st.rerun()
                 
-                # Display replies
                 if post["replies"]:
                     st.write("**Replies:**")
                     for reply in post["replies"]:
@@ -423,7 +784,7 @@ def render_forum_page():
     else:
         st.info("No discussions yet. Be the first to start a conversation!")
 
-# Contact Page Content (stores messages in Supabase)
+# Contact Page Content
 def render_contact_page():
     st.title("📬 Contact Us")
     st.markdown("We'd love to hear from you. Send us your questions or feedback.")
@@ -461,7 +822,6 @@ def get_catalog():
 
 def add_to_cart(item, quantity):
     qty = max(1, int(quantity))
-    # merge if same item exists
     for cart_item in st.session_state.cart:
         if cart_item["id"] == item["id"]:
             cart_item["quantity"] += qty
@@ -512,7 +872,7 @@ def render_order_page():
     else:
         st.info("Your cart is empty. Add some items above.")
 
-# Checkout Page Content (stores order in Supabase)
+# Checkout Page Content
 def render_checkout_page():
     st.title("✅ Checkout")
     if not st.session_state.cart:
