@@ -15,12 +15,12 @@ load_dotenv()
 # Set page configuration
 st.set_page_config(page_title="RoofTop Gardening", layout="wide")
 
-# Apply custom CSS for beautiful background image and green accents
+# Apply custom CSS for beautiful plants background and green accents
 st.markdown(
 """
  <style>
  body {
- background-image: url("https://sl.bing.net/df80MIH7xYq");
+ background-image: linear-gradient(rgba(34,197,94,0.10), rgba(34,197,94,0.10)), url("https://images.unsplash.com/photo-1501004318641-b39e6451bec6?q=80&w=1600&auto=format&fit=crop");
  background-size: cover;
  background-repeat: no-repeat;
  background-attachment: fixed;
@@ -29,11 +29,10 @@ st.markdown(
  padding: 20px;
  border-radius: 10px;
  }
- /* Subtle green accents for headers */
  h1, h2, h3 { color: #16a34a; }
  a { color: #16a34a; }
- .stButton>button { background-color: #16a34a; color: white; border: 0; }
- .stButton>button:hover { background-color: #15803d; }
+ .stButton>button { background-color: #22c55e; color: #ffffff; border: 0; }
+ .stButton>button:hover { background-color: #16a34a; }
  </style>
  """,
 unsafe_allow_html=True
