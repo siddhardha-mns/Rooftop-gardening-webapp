@@ -493,20 +493,38 @@ def is_authenticated():
 def supabase_login_ui():
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        lottie_plant = load_lottie_url(LOTTIE_PLANT)
-        if lottie_plant:
-            st_lottie(lottie_plant, height=200, key="login_plant")
+        # Rotating Earth GIF centered
+        st.markdown(
+            """
+            <div style="display: flex; justify-content: center; margin-bottom: 20px;">
+                <img src="https://i.gifer.com/origin/f4/f4e1b5e37b7c6c8b5e6c8b5e6c8b5e6c.gif" 
+                     alt="Rotating Earth" 
+                     style="width: 250px; height: 250px; border-radius: 50%; box-shadow: 0 8px 32px rgba(67, 160, 71, 0.4);">
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
         
-        st.title("🔐 Sign in to RoofTop Gardening")
-        st.caption("Please sign in or create an account to continue.")
+        st.title("🌿 RoofTop Gardening")
+        st.markdown("""
+        <div style="text-align: center; margin-bottom: 30px;">
+            <p style="font-size: 1.1rem; color: #2e7d32; line-height: 1.6;">
+                Transform your rooftop into a thriving green paradise. Join our community 
+                of urban gardeners and start growing fresh, organic produce today!
+            </p>
+            <p style="font-size: 0.95rem; color: #43a047; margin-top: 15px;">
+                🌱 Sustainable Living • 🌍 Eco-Friendly • 💚 Healthy Lifestyle
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("---")
+        st.subheader("🔐 Sign in to Continue")
+        st.caption("Please sign in or create an account to access all features.")
         
         mode = st.radio("", ["Sign In", "Sign Up"], horizontal=True)
         email = st.text_input("Email")
         password = st.text_input("Password", type="password")
-        sb = get_supabase()
-        if not sb:
-            st.error("Supabase is not configured. Set SUPABASE_URL and SUPABASE_ANON_KEY in .env or secrets.")
-            return
         
         col_a, col_b = st.columns([1,1])
         with col_a:
